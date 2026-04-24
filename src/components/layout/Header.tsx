@@ -59,7 +59,7 @@ const Header = () => {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <img src={logoImg} alt="DTPI Market" className="h-9 w-9 rounded-full object-cover shadow-warm" />
+          <img src={logoImg} alt="DTPI Market" className="h-12 w-12 rounded-full object-cover shadow-warm" />
           <span className="font-display text-xl font-semibold tracking-tight">
             DTPI <span className="text-primary">Market</span>
           </span>
