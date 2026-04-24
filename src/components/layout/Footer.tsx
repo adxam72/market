@@ -7,6 +7,7 @@ const Footer = () => (
     <div className="container grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-5">
       <div className="lg:col-span-2">
         <div className="flex items-center gap-2">
+          <img src={logoImg} alt="DTPI Market" className="h-12 w-12 rounded-full object-cover shadow-warm" />
           <span className="font-display text-xl font-semibold">DTPI Market</span>
         </div>
         <p className="mt-4 max-w-sm text-sm text-muted-foreground leading-relaxed">

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { MessageSquare, Send, Package, Clock, Check, X } from "lucide-react";
+import { MessageSquare, Send, X } from "lucide-react";
 
 type Ticket = {
   id: string;
@@ -32,8 +32,10 @@ const AdminSupport = () => {
   const [tab, setTab] = useState<"open" | "answered" | "closed" | "all">("open");
   const [replies, setReplies] = useState<Record<string, string>>({});
 
+  const db = supabase as any;
+
   const load = async () => {
-    let q = supabase
+    let q = db
       .from("support_tickets")
       .select("*, profiles(full_name, phone)")
       .order("created_at", { ascending: false });
@@ -50,7 +52,7 @@ const AdminSupport = () => {
   const reply = async (t: Ticket) => {
     const text = replies[t.id]?.trim();
     if (!text) { toast({ title: "Javob yozing", variant: "destructive" }); return; }
-    const { error } = await supabase
+    const { error } = await db
       .from("support_tickets")
       .update({
         admin_reply: text,
@@ -65,7 +67,7 @@ const AdminSupport = () => {
   };
 
   const close = async (id: string) => {
-    const { error } = await supabase.from("support_tickets").update({ status: "closed" }).eq("id", id);
+    const { error } = await db.from("support_tickets").update({ status: "closed" }).eq("id", id);
     if (error) { toast({ title: "Xatolik", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Murojaat yopildi" });
     load();

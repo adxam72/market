@@ -21,8 +21,6 @@ const schema = z.object({
   name: z.string().trim().min(2, "Ism kamida 2 belgi").max(100),
   phone: z.string().trim().min(7, "Telefon noto'g'ri").max(20),
   address: z.string().trim().min(5, "Manzilni kiriting").max(500),
-  email: z.string().email("Email noto'g'ri"),
-  notes: z.string().max(500).optional(),
   payment: z.enum(["cod", "online"]),
 });
 
@@ -34,12 +32,11 @@ const Checkout = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signup" | "login">("signup");
   const [authPwd, setAuthPwd] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
   const [form, setForm] = useState({
     name: "",
     phone: "",
     address: "",
-    email: user?.email ?? "",
-    notes: "",
     payment: "cod" as "cod" | "online",
   });
 
@@ -55,7 +52,6 @@ const Checkout = () => {
         shipping_name: form.name,
         shipping_phone: form.phone,
         shipping_address: form.address,
-        notes: form.notes || null,
       })
       .select()
       .single();
@@ -102,18 +98,22 @@ const Checkout = () => {
       setLoading(false);
       return;
     }
-    // Guest → ask for password to create account
     if (form.payment === "online") {
       toast.error("Onlayn to'lov hali ishga tushmagan. Iltimos, 'Yetkazganda naqd to'lov' ni tanlang.");
       return;
     }
     setAuthMode("signup");
     setAuthPwd("");
+    setAuthEmail("");
     setAuthOpen(true);
   };
 
   const finishWithAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!authEmail.trim() || !authEmail.includes("@")) {
+      toast.error("Email to'g'ri kiriting");
+      return;
+    }
     if (authPwd.length < 6) {
       toast.error("Parol kamida 6 belgi");
       return;
@@ -122,7 +122,7 @@ const Checkout = () => {
     let uid: string | undefined;
     if (authMode === "signup") {
       const { data, error } = await supabase.auth.signUp({
-        email: form.email,
+        email: authEmail,
         password: authPwd,
         options: {
           emailRedirectTo: window.location.origin,
@@ -130,7 +130,6 @@ const Checkout = () => {
         },
       });
       if (error) {
-        // Already registered → suggest login
         if (error.message.toLowerCase().includes("already")) {
           setAuthMode("login");
           toast.error("Bu email ro'yxatdan o'tgan. Parolni kiriting.");
@@ -143,7 +142,7 @@ const Checkout = () => {
       uid = data.user?.id;
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: form.email,
+        email: authEmail,
         password: authPwd,
       });
       if (error) {
@@ -158,7 +157,6 @@ const Checkout = () => {
       setLoading(false);
       return;
     }
-    // Update profile with shipping info
     await supabase
       .from("profiles")
       .update({ full_name: form.name, phone: form.phone })
@@ -175,7 +173,7 @@ const Checkout = () => {
         <h1 className="font-display text-3xl font-semibold md:text-4xl">Buyurtmani rasmiylashtirish</h1>
         {!user && (
           <p className="mt-2 text-sm text-muted-foreground">
-            Ma'lumotlarni to'ldiring — oxirida bir bosishda hisob yaratamiz.
+            Ma'lumotlarni to'ldiring — oxirida hisob yaratasiz.
           </p>
         )}
 
@@ -190,6 +188,7 @@ const Checkout = () => {
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className={inputCls}
                     placeholder="Ism Familiya"
+                    required
                   />
                 </Field>
                 <Field label="Telefon *">
@@ -198,33 +197,16 @@ const Checkout = () => {
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className={inputCls}
                     placeholder="+998 90 ..."
+                    required
                   />
                 </Field>
-                {!user && (
-                  <Field label="Email *" full>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className={inputCls}
-                      placeholder="you@example.com"
-                    />
-                  </Field>
-                )}
                 <Field label="Manzil *" full>
                   <input
                     value={form.address}
                     onChange={(e) => setForm({ ...form, address: e.target.value })}
                     className={inputCls}
                     placeholder="Shahar, ko'cha, uy"
-                  />
-                </Field>
-                <Field label="Izoh (ixtiyoriy)" full>
-                  <textarea
-                    value={form.notes}
-                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                    className={`${inputCls} min-h-[80px] py-2.5`}
-                    placeholder="Qo'shimcha eslatma..."
+                    required
                   />
                 </Field>
               </div>
@@ -300,7 +282,7 @@ const Checkout = () => {
             {!user && (
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <Lock className="h-3 w-3" />
-                Buyurtma berilganda hisob avtomatik yaratiladi
+                Oxirida hisob yaratasiz
               </p>
             )}
           </aside>
@@ -311,17 +293,25 @@ const Checkout = () => {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              {authMode === "signup" ? "Oxirgi qadam" : "Hisobingizga kiring"}
+              {authMode === "signup" ? "Hisob yaratish" : "Hisobingizga kiring"}
             </DialogTitle>
             <DialogDescription>
               {authMode === "signup"
-                ? "Buyurtmangizni kuzatish uchun parol o'rnating."
+                ? "Buyurtmangizni kuzatish uchun hisob oching."
                 : "Bu email allaqachon ro'yxatdan o'tgan. Parolingizni kiriting."}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={finishWithAuth} className="space-y-4">
             <Field label="Email">
-              <input value={form.email} disabled className={`${inputCls} opacity-70`} />
+              <input
+                type="email"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                className={inputCls}
+                placeholder="you@example.com"
+                required
+                autoFocus
+              />
             </Field>
             <Field label="Parol">
               <input
@@ -330,7 +320,6 @@ const Checkout = () => {
                 onChange={(e) => setAuthPwd(e.target.value)}
                 className={inputCls}
                 placeholder="Kamida 6 belgi"
-                autoFocus
                 required
               />
             </Field>
@@ -338,7 +327,7 @@ const Checkout = () => {
               {loading
                 ? "Yuklanmoqda..."
                 : authMode === "signup"
-                ? "Buyurtmani tasdiqlash"
+                ? "Hisob ochish va buyurtma berish"
                 : "Kirish va buyurtma berish"}
             </Button>
             <button
