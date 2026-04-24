@@ -57,7 +57,7 @@ const Footer = () => (
     <div className="border-t border-border/60">
       <div className="container flex flex-col gap-2 py-5 text-xs text-muted-foreground sm:flex-row sm:justify-between">
         <span>© {new Date().getFullYear()} DTPI Market. Barcha huquqlar himoyalangan.</span>
-        <span>Toshkentda muhabbat bilan yaratildi 💜</span>
+        <span>Denovda muhabbat bilan yaratildi 💜</span>
       </div>
     </div>
   </footer>
