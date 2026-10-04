@@ -123,4 +123,40 @@
 .hero-blue { background: #102c73; }
 .hero-blue::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 80% 10%, #3679ed55, transparent 65%); }
 .mobile-dock { padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }
+.campus-page { background: linear-gradient(180deg, #f8faff, #ffffff 55%, #f8faff); }
+.campus-title { font-family: 'Inter', system-ui, sans-serif; }
+.campus-gradient-text { color: #2058d5; background: linear-gradient(115deg, #174bc8, #367bed 65%, #1761cf); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.campus-hero { background: #f4f7ff; }
+.campus-grid { background-image: linear-gradient(#3b6be20a 1px, transparent 1px), linear-gradient(90deg, #3b6be20a 1px, transparent 1px); background-size: 64px 64px; mask-image: linear-gradient(90deg, transparent 20%, #000 80%); }
+.ambient-orb { position: absolute; width: 540px; height: 540px; border-radius: 50%; opacity: .65; filter: blur(55px); animation: ambient-drift 18s ease-in-out infinite alternate; }
+.ambient-orb-one { background: radial-gradient(circle, #9dc5ff, #d7e7ff 50%, transparent 70%); top: -130px; right: 4%; }
+.ambient-orb-two { background: radial-gradient(circle, #b7e8fa, #d8e7ff 45%, transparent 70%); bottom: -290px; left: 10%; animation-delay: -8s; animation-duration: 23s; }
+.campus-art { isolation: isolate; }
+.campus-illustration { animation: campus-float 8s ease-in-out infinite; }
+.campus-orbit { position: absolute; border: 1px solid #367bed25; border-radius: 50%; pointer-events: none; z-index: -1; }
+.campus-orbit-one { width: 84%; height: 84%; top: 7%; left: 8%; animation: orbit-breathe 12s ease-in-out infinite; }
+.campus-orbit-two { width: 96%; height: 68%; top: 20%; left: 2%; transform: rotate(-25deg); border-style: dashed; animation: orbit-breathe 17s ease-in-out infinite reverse; }
+.campus-float { animation: badge-float 7s ease-in-out infinite; }
+.campus-float-two { animation-delay: -3s; }
+.hero-copy { animation: hero-arrive .7s ease-out both; }
+.motion-category { transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+.motion-category:hover { transform: translateY(-5px); border-color: #93b4fb; box-shadow: 0 15px 36px -22px #1d4ed850; }
+.motion-button { transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease; }
+.motion-button:hover { transform: translateY(-2px); }
+.motion-button:hover svg { transform: translate(2px, -2px); }
+.motion-button svg { transition: transform .25s ease; }
+.campus-local-panel { background: #123984; }
+.campus-local-panel::after { content: ''; position: absolute; width: 450px; height: 450px; border: 1px solid #ffffff20; border-radius: 50%; right: -70px; top: -190px; box-shadow: 0 0 0 50px #ffffff04, 0 0 0 100px #ffffff03; }
+.reveal { transition: opacity .65s ease var(--reveal-delay, 0ms), transform .65s cubic-bezier(.22,1,.36,1) var(--reveal-delay, 0ms); }
+.reveal[data-visible='false'] { opacity: 0; transform: translateY(24px); }
+.reveal[data-visible='true'] { opacity: 1; transform: translateY(0); }
+.motion-paused .ambient-orb, .motion-paused .campus-illustration, .motion-paused .campus-orbit, .motion-paused .campus-float { animation-play-state: paused !important; }
+@keyframes ambient-drift { from { transform: translate3d(-25px, 0, 0) scale(.95); } to { transform: translate3d(50px, 35px, 0) scale(1.1); } }
+@keyframes campus-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes badge-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-7px) rotate(1deg); } }
+@keyframes orbit-breathe { 0%, 100% { opacity: .45; scale: .96; } 50% { opacity: 1; scale: 1.04; } }
+@keyframes hero-arrive { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 767px) { .ambient-orb { width: 300px; height: 300px; filter: blur(32px); } .campus-float { scale: .8; transform-origin: left center; } .campus-float-two { transform-origin: right center; } }
+@media (hover: none) { .motion-category:hover, .motion-button:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .campus-page *, .campus-page *::before, .campus-page *::after { animation: none !important; transition: none !important; } .reveal[data-visible] { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }

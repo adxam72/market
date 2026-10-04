@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, MessageCircle, Phone, Mail } from "lucide-react";
+import { HelpCircle, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FAQ_GROUPS = [
@@ -19,7 +19,7 @@ const FAQ_GROUPS = [
       },
       {
         q: "To'lovni qanday amalga oshiraman?",
-        a: "Ikki xil usul mavjud: yetkazib berganda naqd to'lash yoki onlayn karta orqali. Ko'p talabalar naqd to'lovni tanlaydi.",
+        a: "Hozircha mahsulotni qabul qilganda naqd to‘laysiz. Onlayn karta to‘lovlari hali ulanmagan.",
       },
     ],
   },
@@ -28,11 +28,11 @@ const FAQ_GROUPS = [
     items: [
       {
         q: "Buyurtma qancha vaqtda yetib keladi?",
-        a: "Toshkent ichida 1-2 ish kuni, viloyatlarga 3-5 ish kuni ichida. Mahsulot avval markaziy omborga keladi, so'ng sizga yuboriladi.",
+        a: "Hozircha DTPI hududi va Denovdagi yaqin atrofga xizmat qilamiz. Topshirish joyi va vaqti sotuvchi bilan kelishiladi. Respublika bo‘ylab yetkazib berish mavjud emas.",
       },
       {
         q: "Yetkazib berish bepulmi?",
-        a: "200 000 so'mdan yuqori buyurtmalar uchun bepul. Boshqa hollarda Toshkent ichida 25 000 so'm.",
+        a: "Mahalliy topshirish shartlarini sotuvchi bilan oldindan aniqlashtiring. Checkoutda buyurtmaga hisoblangan summa ko‘rsatiladi.",
       },
     ],
   },
@@ -41,11 +41,11 @@ const FAQ_GROUPS = [
     items: [
       {
         q: "Sotuvchilar kim?",
-        a: "Faqat universitet talabalari, ularning talaba guvohnomasi tasdiqlangan bo'ladi. Har bir mahsulot qo'lda yaratilgan.",
+        a: "DTPI hamjamiyatidagi talabalar va tasdiqlangan mahalliy sotuvchilar. Mahsulotning tavsifi va sotuvchisi uning sahifasida ko‘rsatiladi.",
       },
       {
         q: "Mahsulot sifati qanday tekshiriladi?",
-        a: "Sotuvchi mahsulotni markaziy omborimizga topshiradi. Bizning komanda har bir mahsulotni qabul qilishdan oldin tekshiradi.",
+        a: "Tavsif va rasmlarni diqqat bilan ko‘ring, zarur savollarni sotuvchi bilan aniqlashtiring. Mahsulotni qabul qilayotganda tekshirib oling.",
       },
       {
         q: "Sotuvchi bo'lish uchun nima qilishim kerak?",
@@ -58,7 +58,7 @@ const FAQ_GROUPS = [
     items: [
       {
         q: "Mahsulot sinib yetib keldi, nima qilaman?",
-        a: "Bizga zudlik bilan +998 90 123 45 67 raqamiga qo'ng'iroq qiling yoki email yuboring. 3 kun ichida pulingiz to'liq qaytariladi.",
+        a: "Mahsulotdagi muammoni rasmga oling va Murojaat yuborish sahifasi orqali administratorga yozing. Buyurtma raqamini ham ko‘rsating.",
       },
       {
         q: "Pul qachon qaytariladi?",
@@ -116,14 +116,9 @@ const FAQ = () => {
           <section className="rounded-3xl border border-border bg-gradient-warm p-8 text-center shadow-card">
             <MessageCircle className="mx-auto h-10 w-10 text-primary" />
             <h2 className="mt-4 font-display text-2xl font-semibold">Hali ham savol bormi?</h2>
-            <p className="mt-2 text-muted-foreground">Bizga bog'laning, biz tezkor javob beramiz.</p>
+            <p className="mt-2 text-muted-foreground">Savolingizni hamjamiyat administratoriga yuboring.</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild variant="hero">
-                <a href="tel:+998901234567"><Phone className="h-4 w-4" /> +998 90 123 45 67</a>
-              </Button>
-              <Button asChild variant="outline">
-                <a href="mailto:hello@dtpi.market"><Mail className="h-4 w-4" /> hello@dtpi.market</a>
-              </Button>
+              <Button asChild className="rounded-xl"><Link to="/support"><MessageCircle className="h-4 w-4" /> Murojaat yuborish</Link></Button>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
               Yoki <Link to="/info/delivery" className="text-primary hover:underline">yetkazib berish</Link>,{" "}

@@ -58,7 +58,7 @@ async function mockApi(page: Page, role = 'guest') {
 test('homepage and catalog respond on desktop and mobile', async ({ page }, info) => {
   await mockApi(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { name: /Har bir buyumda/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Katta g/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: products[0].name })).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -70,6 +70,27 @@ test('homepage and catalog respond on desktop and mobile', async ({ page }, info
   await expect(page.getByRole('heading', { name: 'Hech narsa topilmadi' })).toBeVisible();
   await page.getByRole('button', { name: 'Filtrlarni tozalash', exact: true }).last().click();
   await expect(page.getByText('40 ta mahsulot', { exact: true })).toBeVisible();
+});
+
+test('campus motion can be paused and respects reduced motion', async ({ page }) => {
+  await mockApi(page);
+  await page.goto('/');
+  const illustration = page.locator('.campus-illustration');
+  await expect(illustration).toHaveCSS('animation-name', 'campus-float');
+  await illustration.evaluate((img: HTMLImageElement) => img.decode());
+  await page.getByRole('button', { name: 'Harakatni to‘xtatish', exact: true }).click();
+  await expect(illustration).toHaveCSS('animation-play-state', 'paused');
+  await expect(page.getByRole('button', { name: 'Harakatni yoqish' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Harakatni yoqish' }).click();
+  await expect(illustration).toHaveCSS('animation-play-state', 'running');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.reload();
+  await expect(page.locator('.ambient-orb').first()).toHaveCSS('animation-name', 'none');
+  await expect(page.locator('.campus-illustration')).toHaveCSS('animation-name', 'none');
+  const values = page.getByRole('heading', { name: 'Savdodan ko‘ra ko‘proq.' });
+  await values.scrollIntoViewIfNeeded();
+  await expect(values).toBeVisible();
+  await expect(page.locator('.reveal').last()).toHaveCSS('opacity', '1');
 });
 test('guest adds a product, keeps it on reload and reaches checkout', async ({ page }) => {
   await mockApi(page);

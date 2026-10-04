@@ -7,14 +7,14 @@ const Delivery = () => {
   return (
     <InfoPage
       title="Yetkazib berish"
-      subtitle="Buyurtmangizni qanday va qachon olishingiz mumkinligi haqida"
+      subtitle="DTPI hududi va Denovdagi yaqin atrofda mahsulotni qabul qilish"
       crumbs={[{ label: "Yetkazib berish" }]}
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <Card icon={Package} title="Institut ichida" desc="Sotuvchi mahsulotni o'zi topshiradi" />
-        <Card icon={MapPin} title="Denov tumani" desc="Sotuvchi bilan kelishib olindi" />
-        <Card icon={Clock} title="Buyurtma vaqti" desc="Har kuni 09:00 dan 18:00 gacha" />
-        <Card icon={Truck} title="Tezkor topshirish" desc="Buyurtmadan so'ng 1 kun ichida" />
+        <Card icon={MapPin} title="Yaqin hudud" desc="DTPI va Denovdagi yaqin atrof" />
+        <Card icon={Clock} title="Qulay vaqt" desc="Sotuvchi bilan oldindan kelishiladi" />
+        <Card icon={Truck} title="Mahalliy topshirish" desc="Respublika bo‘ylab yetkazish mavjud emas" />
       </div>
 
       <Section title="Qanday ishlaydi?">
@@ -29,15 +29,15 @@ const Delivery = () => {
       <Section title="Yetkazib berish narxi">
         <p className="text-muted-foreground">
           <b className="text-foreground">Institut hududida</b> — bepul, sotuvchi o'zi topshiradi.{" "}
-          <b className="text-foreground">Denov tumani bo'ylab</b> — sotuvchi bilan alohida kelishiladi.
+          <b className="text-foreground">Denovdagi yaqin atrofda</b> — sotuvchi bilan alohida kelishiladi.
           Narx va usul har bir buyurtma uchun individual tarzda belgilanadi.
         </p>
       </Section>
 
       <Section title="Yetkazish vaqti">
         <p className="text-muted-foreground">
-          Buyurtmalar har kuni 09:00 dan 18:00 gacha qabul qilinadi.
-          Buyurtma berilgandan so'ng sotuvchi 2 soat ichida siz bilan bog'lanadi.
+          Topshirish vaqti mahsulotning mavjudligi va sotuvchi bilan kelishuvga bog‘liq.
+          Buyurtmani rasmiylashtirishdan oldin hudud va qabul qilish joyini aniqlashtiring.
         </p>
       </Section>
     </InfoPage>

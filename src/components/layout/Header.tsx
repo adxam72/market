@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShoppingBag, User, Search, Menu, LogOut, Package, Heart, Shield, Store, MessageSquare } from "lucide-react";
+import { ShoppingBag, User, Search, Menu, LogOut, Package, Heart, Shield, Store, MessageSquare, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
@@ -23,7 +23,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const onSearch = (e: React.FormEvent) => { e.preventDefault(); navigate(`/catalog${q.trim() ? `?q=${encodeURIComponent(q.trim())}` : ""}`); };
   return <header className="sticky top-0 z-40 border-b border-border/70 bg-white/95 shadow-soft backdrop-blur-xl">
-    <div className="bg-[#102c73] text-white"><div className="container flex items-center justify-between gap-3 py-2 text-[10px] sm:text-[11px]"><span>Mahalliy ijodkorlarni birga qo‘llab-quvvatlaymiz.</span><Link to="/sell" className="hidden items-center gap-1.5 sm:flex"><Store size={13} /> Sotuvchi bo‘lish</Link></div></div>
+    <div className="border-b border-blue-100/70 bg-blue-50/80 text-blue-900"><div className="container flex items-center justify-between gap-3 py-2 text-[10px] sm:text-[11px]"><Link to="/info/delivery" className="flex items-center gap-1.5"><MapPin size={12} /> DTPI · Denovdagi yaqin hamjamiyat</Link><Link to="/sell" className="hidden items-center gap-1.5 sm:flex"><Store size={13} /> G‘oyangizni hamjamiyatga tanishtiring</Link></div></div>
     <div className="container flex h-[72px] items-center gap-2 sm:gap-7">
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}><SheetTrigger asChild><Button aria-label="Menyuni ochish" variant="ghost" size="icon" className="shrink-0 md:hidden"><Menu size={21} /></Button></SheetTrigger><SheetContent side="left" className="w-72"><SheetTitle>DTPI Market</SheetTitle><SheetDescription>Mahsulotlar va hisobingizga tezkor o‘tish.</SheetDescription><nav className="mt-6 flex flex-col gap-2">{navLinks.map(l => <Link key={l.to} to={l.to} aria-current={isActive(l.to) ? "page" : undefined} onClick={() => setMenuOpen(false)} className={`rounded-xl px-3 py-3 ${isActive(l.to) ? "bg-blue-50 font-semibold text-primary" : "hover:bg-secondary"}`}>{l.label}</Link>)}<Link to="/sell" onClick={() => setMenuOpen(false)} className="px-3 py-3 text-primary">Sotuvchi bo‘lish</Link></nav></SheetContent></Sheet>
       <Brand />
