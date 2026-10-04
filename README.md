@@ -51,7 +51,7 @@ Frontend orqali o‘ziga admin yoki sotuvchi huquqini berish mumkin emas.
 
 `vercel.json` SPA sahifalarini qayta ochish (`/product/...`, `/seller/...`, `/admin/...`) va himoya sarlavhalarini sozlaydi. Saytning barcha yo‘llari HTTPS domen orqali tekshirilishi kerak. DNS qiymatlari Vercel domen sozlamasidan olinadi; domen noma’lum bo‘lganda taxminiy DNS yozilmaydi.
 
-Hozirgi ish seansida repodagi Supabase manziliga ulanish tasdiqlanmadi. Jonli bazaga migratsiya qo‘llash, jonli foydalanuvchi yaratish yoki Vercel Production deployment bajarilmadi.
+2026-10-04 tekshiruvida mavjud Supabase bazasiga ulanish tasdiqlandi: 4 kategoriya va 23 mahsulot. Vercel loyihasi market-cyp9, domen https://dtpi.store tasdiqlangan. Supabase URL va brauzer uchun publishable kaliti Vercelning Production, Preview va Development muhitlariga kiritildi. Jonli bazaga migratsiya yoki yangi frontendni Productionga chiqarish hali bajarilmadi; buning uchun Supabase boshqaruv ulanishi kerak.
 
 ## Ishlaydigan qismlar
 
