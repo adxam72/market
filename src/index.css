@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* DTPI Market — Premium handmade design system. All colors HSL. */
+/* DTPI Market — blue storefront design system. All colors HSL. */
 
 @layer base {
   :root {
     /* Clean light background */
-    --background: 40 20% 98%;
-    --foreground: 230 25% 10%;
+    --background: 218 40% 98%;
+    --foreground: 222 47% 13%;
 
     --card: 230 25% 100%;
     --card-foreground: 230 25% 10%;
@@ -19,20 +19,20 @@
     --popover-foreground: 230 25% 10%;
 
     /* Purple-blue primary */
-    --primary: 164 43% 24%;
+    --primary: 221 83% 48%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 230 80% 58%;
 
     /* Soft lavender secondary */
-    --secondary: 150 13% 94%;
+    --secondary: 216 60% 95%;
     --secondary-foreground: 230 25% 15%;
 
     --muted: 240 15% 93%;
-    --muted-foreground: 230 12% 45%;
+    --muted-foreground: 218 17% 42%;
 
     /* Light purple accent */
-    --accent: 150 23% 91%;
-    --accent-foreground: 164 43% 24%;
+    --accent: 216 85% 94%;
+    --accent-foreground: 221 83% 40%;
 
     --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
@@ -40,15 +40,15 @@
     --success: 145 45% 42%;
     --success-foreground: 0 0% 100%;
 
-    --border: 240 15% 87%;
-    --input: 240 15% 89%;
-    --ring: 164 43% 24%;
+    --border: 216 30% 89%;
+    --input: 216 30% 86%;
+    --ring: 221 83% 48%;
 
     --radius: 0.875rem;
 
     /* Brand gradients & shadows */
     --gradient-warm: linear-gradient(135deg, hsl(245 30% 95%) 0%, hsl(230 35% 90%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(164 43% 24%) 0%, hsl(164 40% 33%) 100%);
+    --gradient-primary: linear-gradient(135deg, #1549d6 0%, #3778f6 100%);
     --gradient-hero: linear-gradient(180deg, hsl(240 25% 97% / 0) 0%, hsl(230 25% 97%) 100%);
 
     --shadow-soft: 0 2px 12px -2px hsl(230 30% 20% / 0.06);
@@ -59,12 +59,12 @@
 
     --sidebar-background: 230 25% 97%;
     --sidebar-foreground: 230 25% 10%;
-    --sidebar-primary: 255 65% 55%;
+    --sidebar-primary: 221 83% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 20% 92%;
     --sidebar-accent-foreground: 230 25% 15%;
     --sidebar-border: 240 15% 87%;
-    --sidebar-ring: 255 65% 55%;
+    --sidebar-ring: 221 83% 48%;
   }
 
   .dark {
@@ -74,19 +74,19 @@
     --card-foreground: 230 15% 94%;
     --popover: 230 25% 11%;
     --popover-foreground: 230 15% 94%;
-    --primary: 255 70% 65%;
+    --primary: 217 91% 65%;
     --primary-foreground: 0 0% 100%;
     --secondary: 230 15% 18%;
     --secondary-foreground: 230 15% 94%;
     --muted: 230 15% 16%;
     --muted-foreground: 230 12% 60%;
-    --accent: 255 20% 25%;
+    --accent: 217 35% 25%;
     --accent-foreground: 230 15% 94%;
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
     --border: 230 15% 20%;
     --input: 230 15% 20%;
-    --ring: 255 70% 65%;
+    --ring: 217 91% 65%;
   }
 }
 
@@ -97,6 +97,9 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "ss01", "cv11";
   }
+  :focus-visible { outline: 3px solid hsl(var(--ring) / .55); outline-offset: 3px; }
+  input[type="checkbox"] { accent-color: hsl(var(--primary)); }
+  ::selection { background: hsl(var(--primary) / .16); }
   h1, h2, h3, h4, .font-display {
     font-family: 'Inter', system-ui, sans-serif;
     font-optical-sizing: auto;
@@ -116,5 +119,8 @@
   }
 }
 
-.hero-market { background: #eaf0e7; }
+.hero-market { background: #edf3ff; }
+.hero-blue { background: #102c73; }
+.hero-blue::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 80% 10%, #3679ed55, transparent 65%); }
+.mobile-dock { padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
