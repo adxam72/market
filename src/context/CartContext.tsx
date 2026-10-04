@@ -34,13 +34,15 @@ const writeGuest = (list: GuestEntry[]) =>
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user, loading: authLoading } = useAuth();
   const [items, setItems] = useState<CartItemRow[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const merged = useRef(false);
 
   const refreshGuest = useCallback(async () => {
+    setLoading(true);
     const guest = readGuest();
     if (guest.length === 0) {
       setItems([]);
+      setLoading(false);
       return;
     }
     const ids = guest.map((g) => g.product_id);
@@ -61,6 +63,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         })
         .filter(Boolean) as CartItemRow[]
     );
+    setLoading(false);
   }, []);
 
   const refresh = useCallback(async () => {
@@ -74,41 +77,47 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       .select("*, product:products(*)")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-    if (!error && data) setItems(data as any);
+    if (!error && data) setItems(data as CartItemRow[]);
     setLoading(false);
   }, [user, refreshGuest]);
 
   // Merge guest cart into DB when user logs in
   useEffect(() => {
     if (authLoading) return;
+    setLoading(true);
     (async () => {
       if (user && !merged.current) {
         merged.current = true;
         const guest = readGuest();
         if (guest.length > 0) {
-          const { data: existing } = await supabase
+          const { data: existing, error: existingError } = await supabase
             .from("cart_items")
             .select("product_id, quantity, id")
             .eq("user_id", user.id);
           const existingMap = new Map(
-            (existing ?? []).map((e: any) => [e.product_id, e])
+            (existing ?? []).map(e => [e.product_id, e])
           );
+          if (existingError) { toast.error("Savatchani tiklab bo‘lmadi. Qayta kiring."); merged.current = false; await refresh(); return; }
+          const remaining: GuestEntry[] = [];
           for (const g of guest) {
-            const exist: any = existingMap.get(g.product_id);
+            const exist = existingMap.get(g.product_id);
             if (exist) {
-              await supabase
+              const { error } = await supabase
                 .from("cart_items")
                 .update({ quantity: exist.quantity + g.quantity })
                 .eq("id", exist.id);
+              if (error) remaining.push(g);
             } else {
-              await supabase.from("cart_items").insert({
+              const { error } = await supabase.from("cart_items").insert({
                 user_id: user.id,
                 product_id: g.product_id,
                 quantity: g.quantity,
               });
+              if (error) remaining.push(g);
             }
           }
-          writeGuest([]);
+          writeGuest(remaining);
+          if (remaining.length) toast.error("Ayrim mahsulotlar savatchaga ko‘chmadi. Qayta kiring.");
         }
       }
       if (!user) merged.current = false;
@@ -117,6 +126,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [user, authLoading, refresh]);
 
   const addToCart = async (product: Product, qty = 1) => {
+    const current = items.find(i => i.product_id === product.id)?.quantity ?? 0;
+    if (!Number.isInteger(qty) || qty < 1 || current + qty > product.stock) {
+      toast.error("Omborda yetarli mahsulot yo‘q"); return;
+    }
     if (!user) {
       const guest = readGuest();
       const idx = guest.findIndex((g) => g.product_id === product.id);
@@ -142,11 +155,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     toast.success(`${product.name} savatga qo'shildi`);
-    refresh();
+    await refresh();
   };
 
   const updateQty = async (id: string, qty: number) => {
     if (qty < 1) return removeItem(id);
+    const item = items.find(i => i.id === id);
+    if (!Number.isInteger(qty) || qty > (item?.product?.stock ?? 0)) {
+      toast.error("Omborda yetarli mahsulot yo‘q"); return;
+    }
     if (!user || id.startsWith("guest-")) {
       const productId = id.replace("guest-", "");
       const guest = readGuest();
@@ -166,7 +183,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       toast.error(error.message);
       return;
     }
-    refresh();
+    await refresh();
   };
 
   const removeItem = async (id: string) => {
@@ -176,8 +193,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       await refreshGuest();
       return;
     }
-    await supabase.from("cart_items").delete().eq("id", id);
-    refresh();
+    const { error } = await supabase.from("cart_items").delete().eq("id", id);
+    if (error) { toast.error("Mahsulot o‘chirilmadi. Qayta urinib ko‘ring."); return; }
+    await refresh();
   };
 
   const clear = async () => {

@@ -25,6 +25,9 @@ import { useAuth } from "@/context/AuthContext";
 import { formatSom } from "@/lib/format";
 import { Plus, Pencil, Trash2, Upload, X, Search, Star } from "lucide-react";
 import type { Category, Product } from "@/types/db";
+import SellerLayout from "@/components/seller/SellerLayout";
+import { useRole } from "@/hooks/useRole";
+import { errorMessage, productSchema } from "@/lib/marketplace";
 
 const slugify = (s: string) =>
   s.toLowerCase().replace(/['ʻ`]/g, "").replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
@@ -57,8 +60,10 @@ const empty: Form = {
   is_active: true,
 };
 
-const AdminProducts = () => {
+const AdminProducts = ({ sellerMode = false }: { sellerMode?: boolean }) => {
   const { user } = useAuth();
+  const { isSeller, isAdmin } = useRole();
+  const PanelLayout = sellerMode ? SellerLayout : AdminLayout;
   const [items, setItems] = useState<Product[]>([]);
   const [cats, setCats] = useState<Category[]>([]);
   const [open, setOpen] = useState(false);
@@ -66,21 +71,25 @@ const AdminProducts = () => {
   const [form, setForm] = useState<Form>(empty);
   const [search, setSearch] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
+    if (!user || (sellerMode ? !isSeller : !isAdmin)) return;
+    let query = supabase.from("products").select("*").order("created_at", { ascending: false });
+    if (sellerMode) query = query.eq("seller_id", user.id);
     const [{ data: p }, { data: c }] = await Promise.all([
-      supabase.from("products").select("*").order("created_at", { ascending: false }),
+      query,
       supabase.from("categories").select("*").order("display_order"),
     ]);
-    setItems((p as any) ?? []);
-    setCats((c as any) ?? []);
+    setItems(p ?? []);
+    setCats(c ?? []);
   };
 
   useEffect(() => {
-    document.title = "Mahsulotlar — DTPI Admin";
+    document.title = sellerMode ? "Mahsulotlar — DTPI sotuvchi" : "Mahsulotlar — DTPI Admin";
     load();
-  }, []);
+  }, [user, isSeller, isAdmin, sellerMode]);
 
   const openNew = () => {
     setEditing(null);
@@ -111,6 +120,9 @@ const AdminProducts = () => {
     setUploading(true);
     const urls: string[] = [];
     for (const file of Array.from(files)) {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+        toast({ title: "Faqat JPG, PNG yoki WebP, ko‘pi bilan 5 MB", variant: "destructive" }); continue;
+      }
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error } = await supabase.storage.from("product-images").upload(path, file);
@@ -130,6 +142,7 @@ const AdminProducts = () => {
     setForm((f) => ({ ...f, images: f.images.filter((i) => i !== url) }));
 
   const save = async () => {
+    if (saving || uploading || !user) return;
     if (!form.name || !form.price) {
       toast({ title: "Nom va narx kerak", variant: "destructive" });
       return;
@@ -141,17 +154,24 @@ const AdminProducts = () => {
       description: form.description.trim() || null,
       price: Number(form.price),
       compare_at_price: form.compare_at_price ? Number(form.compare_at_price) : null,
-      stock: parseInt(form.stock) || 0,
+      stock: Number(form.stock),
       category_id: form.category_id || null,
       images: form.images,
       is_featured: form.is_featured,
       is_active: form.is_active,
+      seller_id: editing?.seller_id ?? user.id,
     };
+    const validated = productSchema.safeParse(payload);
+    if (!validated.success) {
+      toast({ title: validated.error.issues[0].message, variant: "destructive" }); return;
+    }
+    setSaving(true);
     const { error } = editing
       ? await supabase.from("products").update(payload).eq("id", editing.id)
       : await supabase.from("products").insert(payload);
+    setSaving(false);
     if (error) {
-      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      toast({ title: "Xatolik", description: errorMessage(error), variant: "destructive" });
       return;
     }
     toast({ title: editing ? "Yangilandi" : "Qo'shildi" });
@@ -178,7 +198,7 @@ const AdminProducts = () => {
   );
 
   return (
-    <AdminLayout title="Mahsulotlar">
+    <PanelLayout title="Mahsulotlar">
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -287,8 +307,9 @@ const AdminProducts = () => {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label>Nom</Label>
+                <Label htmlFor="product-name">Nom</Label>
                 <Input
+                  id="product-name"
                   value={form.name}
                   onChange={(e) =>
                     setForm({
@@ -300,32 +321,35 @@ const AdminProducts = () => {
                 />
               </div>
               <div>
-                <Label>Slug</Label>
-                <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
+                <Label htmlFor="product-slug">Mahsulot havolasi</Label>
+                <Input id="product-slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
               </div>
               <div>
-                <Label>SKU</Label>
-                <Input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
+                <Label htmlFor="product-sku">Mahsulot kodi</Label>
+                <Input id="product-sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
               </div>
               <div>
-                <Label>Narx (so'm)</Label>
+                <Label htmlFor="product-price">Narx (so'm)</Label>
                 <Input
+                  id="product-price"
                   type="number"
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                 />
               </div>
               <div>
-                <Label>Eski narx (chegirma uchun)</Label>
+                <Label htmlFor="product-old-price">Eski narx (chegirma uchun)</Label>
                 <Input
+                  id="product-old-price"
                   type="number"
                   value={form.compare_at_price}
                   onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })}
                 />
               </div>
               <div>
-                <Label>Ombor (dona)</Label>
+                <Label htmlFor="product-stock">Ombor (dona)</Label>
                 <Input
+                  id="product-stock"
                   type="number"
                   value={form.stock}
                   onChange={(e) => setForm({ ...form, stock: e.target.value })}
@@ -350,8 +374,9 @@ const AdminProducts = () => {
                 </Select>
               </div>
               <div className="sm:col-span-2">
-                <Label>Tavsif</Label>
+                <Label htmlFor="product-description">Tavsif</Label>
                 <Textarea
+                  id="product-description"
                   rows={4}
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -367,13 +392,13 @@ const AdminProducts = () => {
                 />
                 <span className="text-sm">Faol</span>
               </label>
-              <label className="flex items-center gap-2">
+              {!sellerMode && <label className="flex items-center gap-2">
                 <Switch
                   checked={form.is_featured}
                   onCheckedChange={(v) => setForm({ ...form, is_featured: v })}
                 />
                 <span className="text-sm">Tanlangan</span>
-              </label>
+              </label>}
             </div>
           </div>
 
@@ -381,11 +406,11 @@ const AdminProducts = () => {
             <Button variant="outline" onClick={() => setOpen(false)}>
               Bekor
             </Button>
-            <Button onClick={save}>Saqlash</Button>
+            <Button onClick={save} disabled={saving || uploading}>{saving ? "Saqlanmoqda..." : "Mahsulotni saqlash"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </PanelLayout>
   );
 };
 

@@ -23,6 +23,8 @@ const nav = [
   { to: "/admin/applications", label: "Sotuvchi arizalari", icon: UserCheck },
   { to: "/admin/users", label: "Foydalanuvchilar", icon: Users },
   { to: "/admin/support", label: "Shikoyatlar", icon: MessageSquare },
+  { to: "/admin/reviews", label: "Sharhlar", icon: MessageSquare },
+  { to: "/admin/coupons", label: "Promo kodlar", icon: Tags },
 ];
 
 const AdminLayout = ({ title, children }: { title: string; children: ReactNode }) => {
@@ -95,14 +97,14 @@ const AdminLayout = ({ title, children }: { title: string; children: ReactNode }
         <main className="flex-1 p-5 md:p-8">{children}</main>
 
         {/* Mobile bottom nav */}
-        <nav className="sticky bottom-0 z-20 flex justify-around border-t border-border bg-card/95 backdrop-blur-xl md:hidden">
-          {nav.slice(0, 5).map((n) => (
+        <nav className="sticky bottom-0 z-20 flex overflow-x-auto border-t border-border bg-card/95 backdrop-blur-xl md:hidden">
+          {nav.map((n) => (
             <NavLink
               key={n.to}
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] ${
+                `flex shrink-0 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] ${
                   isActive ? "text-primary" : "text-muted-foreground"
                 }`
               }

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { MessageSquare, Send, X } from "lucide-react";
+import { MessageSquare, Send, X, Package } from "lucide-react";
 
 type Ticket = {
   id: string;
@@ -32,7 +32,7 @@ const AdminSupport = () => {
   const [tab, setTab] = useState<"open" | "answered" | "closed" | "all">("open");
   const [replies, setReplies] = useState<Record<string, string>>({});
 
-  const db = supabase as any;
+  const db = supabase;
 
   const load = async () => {
     let q = db
@@ -41,7 +41,7 @@ const AdminSupport = () => {
       .order("created_at", { ascending: false });
     if (tab !== "all") q = q.eq("status", tab);
     const { data } = await q;
-    setTickets((data as any) ?? []);
+    setTickets((data as Ticket[]) ?? []);
   };
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const AdminSupport = () => {
                 <div>
                   <p className="font-display text-lg font-semibold">{t.subject}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {(t.profiles as any)?.full_name ?? "Noma'lum"} ·{" "}
+                    {t.profiles?.full_name ?? "Noma'lum"} ·{" "}
                     {new Date(t.created_at).toLocaleString("uz-UZ", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>

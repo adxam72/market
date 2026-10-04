@@ -32,7 +32,7 @@ const AdminCategories = () => {
 
   const load = async () => {
     const { data } = await supabase.from("categories").select("*").order("display_order");
-    setItems((data as any) ?? []);
+    setItems(data ?? []);
   };
 
   useEffect(() => {

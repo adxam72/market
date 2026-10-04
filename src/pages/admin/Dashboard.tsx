@@ -11,6 +11,9 @@ import {
   Clock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import type { Tables } from "@/integrations/supabase/types";
+import { statusLabels } from "@/lib/marketplace";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 type Stats = {
   totalRevenue: number;
@@ -23,13 +26,14 @@ type Stats = {
 
 const Dashboard = () => {
   const [stats, setStats] = useState<Stats | null>(null);
-  const [recent, setRecent] = useState<any[]>([]);
+  const [recent, setRecent] = useState<Tables<"orders">[]>([]);
+  const [chart, setChart] = useState<{ day: string; total: number }[]>([]);
 
   useEffect(() => {
     document.title = "Boshqaruv paneli — DTPI Admin";
     (async () => {
       const [orders, pending, products, users, apps, recentOrders] = await Promise.all([
-        supabase.from("orders").select("total, status"),
+        supabase.from("orders").select("total, status, created_at"),
         supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
@@ -39,8 +43,8 @@ const Dashboard = () => {
 
       const all = orders.data ?? [];
       const revenue = all
-        .filter((o: any) => o.status === "delivered")
-        .reduce((s: number, o: any) => s + Number(o.total), 0);
+        .filter(o => o.status === "delivered")
+        .reduce((s, o) => s + Number(o.total), 0);
 
       setStats({
         totalRevenue: revenue,
@@ -51,6 +55,10 @@ const Dashboard = () => {
         pendingApplications: apps.count ?? 0,
       });
       setRecent(recentOrders.data ?? []);
+      setChart(Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(); date.setDate(date.getDate() - 6 + i);
+        return { day: date.toLocaleDateString("uz-UZ", { day: "numeric", month: "short" }), total: all.filter(o => o.status === "delivered" && new Date(o.created_at).toDateString() === date.toDateString()).reduce((sum, o) => sum + Number(o.total), 0) };
+      }));
     })();
   }, []);
 
@@ -97,6 +105,7 @@ const Dashboard = () => {
         />
       </div>
 
+      <section className="mt-8 rounded-2xl border bg-white p-6"><h2 className="text-lg font-semibold">Savdo analitikasi</h2><p className="mt-1 text-xs text-muted-foreground">Oxirgi 7 kunda berilgan va yetkazilgan buyurtmalar</p><div className="mt-6 h-60"><ResponsiveContainer width="100%" height="100%"><AreaChart data={chart}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="day" fontSize={10} /><YAxis width={50} fontSize={10} tickFormatter={v => `${Number(v) / 1000} ming`} /><Tooltip formatter={v => [formatSom(Number(v)), "Savdo"]} /><Area type="monotone" dataKey="total" stroke="#235844" fill="#e2eee7" strokeWidth={2} /></AreaChart></ResponsiveContainer></div></section>
       <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold">So'nggi buyurtmalar</h2>
@@ -116,7 +125,7 @@ const Dashboard = () => {
                 </div>
                 <div className="text-right">
                   <p className="font-display font-semibold">{formatSom(Number(o.total))}</p>
-                  <p className="text-xs text-muted-foreground">{o.status}</p>
+                  <p className="text-xs text-muted-foreground">{statusLabels[o.status]}</p>
                 </div>
               </div>
             ))}
@@ -134,7 +143,7 @@ const StatCard = ({
   tone,
   to,
 }: {
-  icon: any;
+  icon: typeof TrendingUp;
   label: string;
   value: string | number;
   tone?: "primary" | "warning";

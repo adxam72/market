@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Search, Shield, Store, User as UserIcon, Pencil } from "lucide-react";
+import type { AppRole } from "@/hooks/useRole";
 
 type Row = {
   id: string;
@@ -40,11 +41,11 @@ const AdminUsers = () => {
       supabase.from("user_roles").select("user_id, role"),
     ]);
     const byUser: Record<string, string[]> = {};
-    (roles ?? []).forEach((r: any) => {
+    (roles ?? []).forEach(r => {
       byUser[r.user_id] = [...(byUser[r.user_id] ?? []), r.role];
     });
     setRows(
-      (profiles ?? []).map((p: any) => ({ ...p, roles: byUser[p.id] ?? ["customer"] }))
+      (profiles ?? []).map(p => ({ ...p, roles: byUser[p.id] ?? ["customer"] }))
     );
   };
 
@@ -68,7 +69,7 @@ const AdminUsers = () => {
     }).eq("id", editing.id);
     if (profileErr) { toast({ title: "Xatolik", description: profileErr.message, variant: "destructive" }); setSaving(false); return; }
     if (roleToAdd && !editing.roles.includes(roleToAdd)) {
-      const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: editing.id, role: roleToAdd as any });
+      const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: editing.id, role: roleToAdd });
       if (roleErr) toast({ title: "Rol qo'shishda xatolik", description: roleErr.message, variant: "destructive" });
     }
     toast({ title: "Saqlandi" });
@@ -79,7 +80,7 @@ const AdminUsers = () => {
 
   const removeRole = async (userId: string, role: string) => {
     if (!confirm(`"${role}" rolini olib tashlamoqchimisiz?`)) return;
-    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role as any);
+    const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role as AppRole);
     if (error) { toast({ title: "Xatolik", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Rol olib tashlandi" });
     load();
@@ -125,7 +126,7 @@ const AdminUsers = () => {
                     {r.roles.map((role) => (
                       <span key={role} className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${role === "admin" ? "bg-primary/15 text-primary" : role === "seller" ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground"}`}>
                         {role === "admin" ? <Shield className="h-2.5 w-2.5" /> : role === "seller" ? <Store className="h-2.5 w-2.5" /> : <UserIcon className="h-2.5 w-2.5" />}
-                        {role}
+                        {role === "admin" ? "Admin" : role === "seller" ? "Sotuvchi" : "Xaridor"}
                       </span>
                     ))}
                   </div>
@@ -161,7 +162,7 @@ const AdminUsers = () => {
               <div className="mt-2 flex flex-wrap gap-2">
                 {editing?.roles.map((role) => (
                   <span key={role} className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${role === "admin" ? "bg-primary/15 text-primary" : role === "seller" ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground"}`}>
-                    {role}
+                    {role === "admin" ? "Admin" : role === "seller" ? "Sotuvchi" : "Xaridor"}
                     {role !== "customer" && (
                       <button onClick={() => { removeRole(editing.id, role); setEditOpen(false); }} className="ml-1 hover:text-destructive" title="Olib tashlash">×</button>
                     )}
@@ -169,7 +170,7 @@ const AdminUsers = () => {
                 ))}
               </div>
               <div className="mt-3">
-                <select value={roleToAdd} onChange={(e) => setRoleToAdd(e.target.value as any)} className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-primary">
+                <select value={roleToAdd} onChange={(e) => setRoleToAdd(e.target.value as "admin" | "seller" | "")} className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-primary">
                   <option value="">Rol qo'shish...</option>
                   {!editing?.roles.includes("admin") && <option value="admin">Admin</option>}
                   {!editing?.roles.includes("seller") && <option value="seller">Sotuvchi</option>}

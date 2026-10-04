@@ -34,12 +34,12 @@ CREATE POLICY "Users can create tickets"
 -- Admin hamma ticketlarni ko'ra oladi
 CREATE POLICY "Admins can view all tickets"
   ON public.support_tickets FOR SELECT
-  USING (public.has_role('admin', auth.uid()));
+  USING (public.has_role(auth.uid(), 'admin'));
 
 -- Admin ticketlarni yangilay oladi (javob berish)
 CREATE POLICY "Admins can update tickets"
   ON public.support_tickets FOR UPDATE
-  USING (public.has_role('admin', auth.uid()));
+  USING (public.has_role(auth.uid(), 'admin'));
 
 -- support_tickets jadvaliga profiles relation qo'shish (admin uchun)
 -- Bu allaqachon foreign key orqali ishlaydi

@@ -1,66 +1,11 @@
 import { Link } from "react-router-dom";
-import { Instagram, Send, Phone, Mail } from "lucide-react";
-import logoImg from "@/assets/logo.png";
-
-const Footer = () => (
-  <footer className="mt-24 border-t border-border bg-secondary/30 paper-texture">
-    <div className="container grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-5">
-      <div className="lg:col-span-2">
-        <div className="flex items-center gap-2">
-          <img src={logoImg} alt="DTPI Market" className="h-12 w-12 rounded-full object-cover shadow-warm" />
-          <span className="font-display text-xl font-semibold">DTPI Market</span>
-        </div>
-        <p className="mt-4 max-w-sm text-sm text-muted-foreground leading-relaxed">
-          Universitet talabalari tomonidan qo'lda yaratilgan noyob mahsulotlar bozori.
-          Har bir buyum ortida talabaning hikoyasi va mehnati turadi.
-        </p>
-        <div className="mt-5 flex gap-3">
-          <a href="#" aria-label="Instagram" className="flex h-9 w-9 items-center justify-center rounded-full bg-background hover:bg-primary hover:text-primary-foreground transition">
-            <Instagram className="h-4 w-4" />
-          </a>
-          <a href="#" aria-label="Telegram" className="flex h-9 w-9 items-center justify-center rounded-full bg-background hover:bg-primary hover:text-primary-foreground transition">
-            <Send className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
-
-      <div>
-        <h4 className="font-display text-sm font-semibold">Bozor</h4>
-        <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-          <li><Link to="/catalog" className="hover:text-foreground">Barcha mahsulotlar</Link></li>
-          <li><Link to="/catalog?featured=1" className="hover:text-foreground">Tanlangan</Link></li>
-          <li><Link to="/about" className="hover:text-foreground">Biz haqimizda</Link></li>
-          <li><Link to="/sell" className="hover:text-foreground">Sotuvchi bo'lish</Link></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 className="font-display text-sm font-semibold">Yordam</h4>
-        <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-          <li><Link to="/faq" className="hover:text-foreground">Yordam markazi</Link></li>
-          <li><Link to="/info/delivery" className="hover:text-foreground">Yetkazib berish</Link></li>
-          <li><Link to="/info/payment" className="hover:text-foreground">To'lov</Link></li>
-          <li><Link to="/info/returns" className="hover:text-foreground">Qaytarish</Link></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 className="font-display text-sm font-semibold">Aloqa</h4>
-        <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-          <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +998 90 123 45 67</li>
-          <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> hello@dtpi.market</li>
-          <li><Link to="/info/privacy" className="hover:text-foreground">Maxfiylik siyosati</Link></li>
-          <li><Link to="/info/terms" className="hover:text-foreground">Foydalanish shartlari</Link></li>
-        </ul>
-      </div>
-    </div>
-    <div className="border-t border-border/60">
-      <div className="container flex flex-col gap-2 py-5 text-xs text-muted-foreground sm:flex-row sm:justify-between">
-        <span>© {new Date().getFullYear()} DTPI Market. Barcha huquqlar himoyalangan.</span>
-        <span>Denovda muhabbat bilan yaratildi 💜</span>
-      </div>
-    </div>
-  </footer>
-);
-
-export default Footer;
+import { ArrowUpRight } from "lucide-react";
+import Brand from "@/components/Brand";
+export default function Footer() {
+  return <footer className="mt-20 border-t bg-white"><div className="container grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4"><div><Brand /><p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">DTPI talabalari va mahalliy ijodkorlar uchun zamonaviy savdo maydoni. Kerakli mahsulotlar — bir joyda.</p></div>
+    <FooterLinks title="Xarid qilish" links={[["Barcha mahsulotlar", "/catalog"], ["Yangi mahsulotlar", "/catalog?sort=newest"], ["Chegirmalar", "/catalog?sale=1"], ["Sevimlilar", "/account/favorites"]]} />
+    <FooterLinks title="Yordam" links={[["Savol va javoblar", "/faq"], ["Yetkazib berish", "/info/delivery"], ["To‘lov", "/info/payment"], ["Qaytarish", "/info/returns"]]} />
+    <FooterLinks title="DTPI bilan birga" links={[["Biz haqimizda", "/about"], ["Sotuvchi bo‘lish", "/sell"], ["Sotuvchi paneli", "/seller"], ["Murojaat yuborish", "/support"]]} />
+  </div><div className="container flex flex-wrap justify-between gap-4 border-t py-5 text-xs text-muted-foreground"><span>© {new Date().getFullYear()} DTPI Market. Barcha huquqlar himoyalangan.</span><div className="flex gap-5"><Link to="/info/privacy">Maxfiylik siyosati</Link><Link to="/info/terms">Foydalanish shartlari</Link></div></div></footer>;
+}
+function FooterLinks({ title, links }: { title: string; links: string[][] }) { return <div><h3 className="text-sm font-semibold">{title}</h3><ul className="mt-5 space-y-3 text-sm text-muted-foreground">{links.map(([label, to]) => <li key={to}><Link className="inline-flex items-center gap-1 hover:text-primary" to={to}>{label}<ArrowUpRight size={12} /></Link></li>)}</ul></div>; }

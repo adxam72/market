@@ -44,7 +44,7 @@ const Payment = () => {
   );
 };
 
-const Method = ({ icon: Icon, title, text }: { icon: any; title: string; text: string }) => (
+const Method = ({ icon: Icon, title, text }: { icon: typeof import("lucide-react").CreditCard; title: string; text: string }) => (
   <div className="rounded-2xl border border-border bg-secondary/30 p-5">
     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
       <Icon className="h-5 w-5" />

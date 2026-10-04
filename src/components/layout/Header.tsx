@@ -6,146 +6,41 @@ import { useCart } from "@/context/CartContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useRole } from "@/hooks/useRole";
 import { useState } from "react";
-import logoImg from "@/assets/logo.png";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import Brand from "@/components/Brand";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-const Header = () => {
+const navLinks = [{ to: "/", label: "Bosh sahifa" }, { to: "/catalog", label: "Mahsulotlar" }, { to: "/catalog?sort=newest", label: "Yangi mahsulotlar" }, { to: "/catalog?featured=1", label: "Saralanganlar" }, { to: "/catalog?sale=1", label: "Chegirmalar" }];
+export default function Header() {
   const { user, signOut } = useAuth();
   const { count } = useCart();
   const { count: favCount } = useFavorites();
-  const { isAdmin } = useRole();
+  const { isAdmin, isSeller } = useRole();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-
-  const onSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (q.trim()) navigate(`/catalog?q=${encodeURIComponent(q.trim())}`);
-  };
-
-  const navLinks = [
-    { to: "/catalog", label: "Katalog" },
-    { to: "/sell", label: "Sotuvchi bo'lish" },
-    { to: "/about", label: "Biz haqimizda" },
-    { to: "/faq", label: "Yordam" },
-  ];
-
-  return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
-      <div className="container flex h-16 items-center gap-4 md:gap-6">
-        {/* Mobile menu */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-72">
-            <nav className="mt-8 flex flex-col gap-1">
-              {navLinks.map(l => (
-                <NavLink key={l.to} to={l.to} className="rounded-lg px-3 py-2.5 text-base hover:bg-accent">
-                  {l.label}
-                </NavLink>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
-
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <img src={logoImg} alt="DTPI Market" className="h-12 w-12 rounded-full object-cover shadow-warm" />
-          <span className="font-display text-xl font-semibold tracking-tight">
-            DTPI <span className="text-primary">Market</span>
-          </span>
-        </Link>
-
-        {/* Search */}
-        <form onSubmit={onSearch} className="relative hidden flex-1 max-w-xl md:block">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Qo'l mehnati mahsulotlarini qidiring..."
-            className="h-11 w-full rounded-full border border-input bg-secondary/40 pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:bg-background"
-          />
-        </form>
-
-        {/* Desktop nav */}
-        <nav className="ml-auto hidden items-center gap-1 lg:flex">
-          {navLinks.map(l => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              className={({ isActive }) =>
-                `rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`
-              }
-            >
-              {l.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-1 lg:ml-0">
-          {user && (
-            <Button variant="ghost" size="icon" asChild className="relative hidden sm:inline-flex">
-              <Link to="/account/favorites" aria-label="Tanlanganlar">
-                <Heart className="h-5 w-5" />
-                {favCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-warm">
-                    {favCount}
-                  </span>
-                )}
-              </Link>
-            </Button>
-          )}
-          <Button variant="ghost" size="icon" asChild className="relative">
-            <Link to="/cart" aria-label="Savat">
-              <ShoppingBag className="h-5 w-5" />
-              {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-warm">
-                  {count}
-                </span>
-              )}
-            </Link>
-          </Button>
-
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon"><User className="h-5 w-5" /></Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem asChild><Link to="/account"><User className="mr-2 h-4 w-4" />Profil</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/account/orders"><Package className="mr-2 h-4 w-4" />Buyurtmalarim</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/account/favorites"><Heart className="mr-2 h-4 w-4" />Tanlanganlar</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/support"><MessageSquare className="mr-2 h-4 w-4" />Yordam / Shikoyat</Link></DropdownMenuItem>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild><Link to="/admin"><Shield className="mr-2 h-4 w-4" />Admin panel</Link></DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Chiqish</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button variant="default" size="sm" asChild className="hidden sm:inline-flex">
-              <Link to="/auth">Kirish</Link>
-            </Button>
-          )}
-        </div>
+  const [menuOpen, setMenuOpen] = useState(false);
+  const onSearch = (e: React.FormEvent) => { e.preventDefault(); navigate(`/catalog${q.trim() ? `?q=${encodeURIComponent(q.trim())}` : ""}`); };
+  return <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-xl">
+    <div className="bg-primary text-white"><div className="container flex items-center justify-between gap-3 py-2 text-[11px]"><span>Kerakli mahsulotlar — bir joyda.</span><Link to="/sell" className="flex items-center gap-1.5"><Store size={13} /> Sotuvchi bo‘lish</Link></div></div>
+    <div className="container flex h-20 items-center gap-3 sm:gap-7">
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}><SheetTrigger asChild><Button aria-label="Menyuni ochish" variant="ghost" size="icon" className="md:hidden"><Menu size={21} /></Button></SheetTrigger><SheetContent side="left" className="w-72"><nav className="mt-10 flex flex-col gap-2">{navLinks.map(l => <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-secondary">{l.label}</Link>)}<Link to="/sell" onClick={() => setMenuOpen(false)} className="px-3 py-3 text-primary">Sotuvchi bo‘lish</Link></nav></SheetContent></Sheet>
+      <Brand />
+      <form onSubmit={onSearch} className="relative hidden flex-1 md:block"><input aria-label="Mahsulotlarni qidirish" value={q} onChange={e => setQ(e.target.value)} placeholder="Mahsulot, kategoriya yoki sotuvchi qidiring..." className="h-11 w-full rounded-xl border bg-secondary/40 pl-4 pr-12 text-sm outline-none focus:border-primary" /><button aria-label="Qidirish" className="absolute right-1 top-1 rounded-lg bg-primary p-2.5 text-white"><Search size={16} /></button></form>
+      <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-3">
+        <Link to="/account/favorites" aria-label="Sevimlilar" className="relative rounded-xl p-2.5 hover:bg-secondary"><Heart size={21} />{favCount > 0 && <Counter value={favCount} />}</Link>
+        <Link to="/cart" aria-label="Savatcha" className="relative rounded-xl p-2.5 hover:bg-secondary"><ShoppingBag size={21} />{count > 0 && <Counter value={count} />}</Link>
+        {user ? <DropdownMenu><DropdownMenuTrigger asChild><Button aria-label="Profil menyusi" variant="ghost" size="icon"><User size={21} /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuItem asChild><Link to="/account"><User className="mr-2 h-4 w-4" />Profil</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild><Link to="/account/orders"><Package className="mr-2 h-4 w-4" />Buyurtmalarim</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild><Link to="/account/favorites"><Heart className="mr-2 h-4 w-4" />Sevimlilar</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild><Link to="/support"><MessageSquare className="mr-2 h-4 w-4" />Yordam</Link></DropdownMenuItem>
+          {isSeller && <DropdownMenuItem asChild><Link to="/seller"><Store className="mr-2 h-4 w-4" />Sotuvchi paneli</Link></DropdownMenuItem>}
+          {isAdmin && <DropdownMenuItem asChild><Link to="/admin"><Shield className="mr-2 h-4 w-4" />Admin panel</Link></DropdownMenuItem>}
+          <DropdownMenuSeparator /><DropdownMenuItem onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Chiqish</DropdownMenuItem>
+        </DropdownMenuContent></DropdownMenu> : <Link to="/auth" aria-label="Tizimga kirish" className="rounded-xl p-2.5 hover:bg-secondary"><User size={21} /></Link>}
       </div>
-    </header>
-  );
-};
-
-export default Header;
+    </div>
+    <div className="border-y border-border/70"><div className="container hidden h-11 items-center gap-7 text-xs md:flex">{navLinks.map(l => <NavLink key={l.to} end to={l.to} className="font-medium text-muted-foreground hover:text-primary">{l.label}</NavLink>)}<Link to="/about" className="ml-auto text-muted-foreground hover:text-primary">Biz haqimizda</Link></div><form onSubmit={onSearch} className="container flex gap-2 py-2 md:hidden"><input aria-label="Mahsulotlarni qidirish" value={q} onChange={e => setQ(e.target.value)} placeholder="Mahsulot qidiring..." className="h-10 min-w-0 flex-1 rounded-lg border bg-white px-3 text-sm" /><Button aria-label="Qidirish" size="icon"><Search size={18} /></Button></form></div>
+  </header>;
+}
+function Counter({ value }: { value: number }) { return <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">{value}</span>; }

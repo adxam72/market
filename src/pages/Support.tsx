@@ -37,7 +37,7 @@ const Support = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [tickets]);
 
-  const db = supabase as any;
+  const db = supabase;
 
   const load = async () => {
     if (!user) return;
@@ -50,7 +50,7 @@ const Support = () => {
     setLoading(false);
   };
 
-  const send = async (e: React.FormEvent) => {
+  const send = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!user || !text.trim()) return;
     setSending(true);
@@ -147,7 +147,7 @@ const Support = () => {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  send(e as any);
+                  send(e);
                 }
               }}
               placeholder="Xabar yozing... (Enter — yuborish)"

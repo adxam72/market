@@ -6,14 +6,15 @@ import { formatSom } from "@/lib/format";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 
 const Cart = () => {
-  const { items, total, count, updateQty, removeItem } = useCart();
+  const { items, total, count, updateQty, removeItem, loading } = useCart();
+  if (loading) return <Layout><p className="container py-20">Yuklanmoqda...</p></Layout>;
 
   if (items.length === 0) {
     return (
       <Layout>
         <div className="container py-24 text-center">
           <ShoppingBag className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h1 className="mt-6 font-display text-3xl font-semibold">Savat bo'sh</h1>
+          <h1 className="mt-6 font-display text-3xl font-semibold">Savatchangiz hozircha bo‘sh</h1>
           <p className="mt-2 text-muted-foreground">Mahsulotlarni qidirib, savatga qo'shing.</p>
           <Button variant="hero" size="lg" className="mt-6" asChild><Link to="/catalog">Katalogga o'tish</Link></Button>
         </div>
@@ -40,15 +41,15 @@ const Cart = () => {
                   <p className="mt-1 text-sm text-muted-foreground">{formatSom(it.product?.price ?? 0)}</p>
                   <div className="mt-auto flex items-center justify-between">
                     <div className="flex items-center gap-1 rounded-full border border-input p-1">
-                      <button onClick={() => updateQty(it.id, it.quantity - 1)} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-secondary">
+                      <button aria-label="Miqdorni kamaytirish" onClick={() => updateQty(it.id, it.quantity - 1)} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-secondary">
                         <Minus className="h-3 w-3" />
                       </button>
                       <span className="w-8 text-center text-sm font-medium">{it.quantity}</span>
-                      <button onClick={() => updateQty(it.id, it.quantity + 1)} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-secondary">
+                      <button aria-label="Miqdorni oshirish" onClick={() => updateQty(it.id, it.quantity + 1)} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-secondary">
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
-                    <button onClick={() => removeItem(it.id)} className="text-muted-foreground hover:text-destructive">
+                    <button aria-label="Mahsulotni o‘chirish" onClick={() => removeItem(it.id)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

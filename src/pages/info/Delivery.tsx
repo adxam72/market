@@ -44,7 +44,7 @@ const Delivery = () => {
   );
 };
 
-const Card = ({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) => (
+const Card = ({ icon: Icon, title, desc }: { icon: typeof import("lucide-react").Truck; title: string; desc: string }) => (
   <div className="flex gap-3 rounded-2xl border border-border bg-secondary/30 p-4">
     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
       <Icon className="h-5 w-5" />

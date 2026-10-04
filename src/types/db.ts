@@ -22,6 +22,8 @@ export type Product = {
   is_active: boolean;
   rating_avg: number;
   rating_count: number;
+  seller?: { full_name: string | null } | null;
+  seller_name?: string | null;
 };
 
 export type CartItemRow = {

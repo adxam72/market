@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,11 +12,13 @@ import { Star, Minus, Plus, ShoppingBag, Truck, Shield, Package, Heart } from "l
 import ProductCard from "@/components/ProductCard";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { errorMessage } from "@/lib/marketplace";
 
 type Review = { id: string; rating: number; comment: string | null; created_at: string; user_id: string };
 
 const ProductDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isFavorite, toggle } = useFavorites();
   const { user } = useAuth();
@@ -30,26 +32,37 @@ const ProductDetail = () => {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     if (!slug) return;
+    setProduct(null); setLoading(true); setError(""); setQty(1); setActiveImage(0);
+    setReviews([]); setRelated([]); setCanReview(false); setAlreadyReviewed(false);
+    let cancelled = false;
     (async () => {
-      const { data } = await supabase.from("products").select("*").eq("slug", slug).maybeSingle();
+      const { data, error: loadError } = await supabase.from("products").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
+      if (cancelled) return;
+      setLoading(false);
+      if (loadError) { setError(errorMessage(loadError)); return; }
       if (data) {
         setProduct(data as Product);
         document.title = `${data.name} — DTPI Market`;
         const { data: rel } = await supabase
-          .from("products").select("*").eq("category_id", data.category_id).neq("id", data.id).limit(4);
-        if (rel) setRelated(rel as Product[]);
+          .from("products").select("*").eq("is_active", true).eq("category_id", data.category_id).neq("id", data.id).limit(4);
+        if (rel && !cancelled) setRelated(rel as Product[]);
         const { data: rev } = await supabase
           .from("reviews").select("*").eq("product_id", data.id).order("created_at", { ascending: false });
-        if (rev) setReviews(rev as Review[]);
+        if (rev && !cancelled) setReviews(rev as Review[]);
       }
     })();
+    return () => { cancelled = true; };
   }, [slug]);
 
   // Check if user can review (must have delivered order with this product)
   useEffect(() => {
+    setCanReview(false); setAlreadyReviewed(false);
     if (!user || !product) return;
     (async () => {
       // Check if already reviewed
@@ -62,8 +75,8 @@ const ProductDetail = () => {
         .from("orders").select("id, order_items(product_id)")
         .eq("user_id", user.id).eq("status", "delivered");
       if (orders) {
-        const hasProduct = orders.some((o: any) =>
-          o.order_items?.some((it: any) => it.product_id === product.id)
+        const hasProduct = orders.some(o =>
+          o.order_items?.some(it => it.product_id === product.id)
         );
         setCanReview(hasProduct);
       }
@@ -93,7 +106,7 @@ const ProductDetail = () => {
   };
 
   if (!product) {
-    return <Layout><div className="container py-20 text-center text-muted-foreground">Yuklanmoqda...</div></Layout>;
+    return <Layout><div className="container py-20 text-center text-muted-foreground"><p>{loading ? "Yuklanmoqda..." : error || "Mahsulot topilmadi yoki sotuvdan olindi."}</p>{!loading && <Button asChild className="mt-5"><Link to="/catalog">Mahsulotlarni ko‘rish</Link></Button>}</div></Layout>;
   }
 
   return (
@@ -109,18 +122,20 @@ const ProductDetail = () => {
           <div className="space-y-3">
             <div className="overflow-hidden rounded-3xl bg-secondary/40 shadow-card">
               <img
-                src={product.images[0] || "/placeholder.svg"}
+                src={product.images[activeImage] || "/placeholder.svg"}
                 alt={product.name}
                 width={800}
                 height={800}
                 className="aspect-square w-full object-cover"
               />
             </div>
+            {product.images.length > 1 && <div className="flex gap-3 overflow-x-auto">{product.images.map((image, i) => <button key={image} aria-label={`${i + 1}-rasmni ko‘rish`} onClick={() => setActiveImage(i)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 ${i === activeImage ? "border-primary" : "border-transparent"}`}><img src={image} alt="" className="h-full w-full object-cover" /></button>)}</div>}
           </div>
 
           <div>
             <p className="text-xs font-medium uppercase tracking-widest text-primary">SKU: {product.sku}</p>
             <h1 className="mt-2 font-display text-3xl font-semibold leading-tight md:text-4xl">{product.name}</h1>
+            {(product.seller_name || product.seller?.full_name) && <p className="mt-3 text-sm text-muted-foreground">Sotuvchi: <span className="text-primary">{product.seller_name || product.seller?.full_name}</span></p>}
 
             {product.rating_count > 0 && (
               <div className="mt-3 flex items-center gap-2 text-sm">
@@ -179,6 +194,7 @@ const ProductDetail = () => {
             <p className="mt-3 text-xs text-muted-foreground">
               {product.stock > 0 ? `${product.stock} dona mavjud` : "Hozircha mavjud emas"}
             </p>
+            <Button variant="outline" className="mt-5 w-full" disabled={product.stock === 0} onClick={async () => { await addToCart(product, qty); navigate("/cart"); }}>Hozir xarid qilish</Button>
 
             <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-6 text-center text-xs">
               <div className="flex flex-col items-center gap-2"><Truck className="h-5 w-5 text-primary" /><span>Tezkor yetkazish</span></div>

@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle2, Clock, X, ShieldCheck } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
 
 const steps = [
   { n: "01", t: "Ariza yuboring", d: "Quyidagi formani to'ldiring va ariza yuboring." },
@@ -21,7 +22,7 @@ const steps = [
 const Sell = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [existing, setExisting] = useState<any>(null);
+  const [existing, setExisting] = useState<Tables<"seller_applications"> | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -135,7 +136,7 @@ const Sell = () => {
               </Button>
             </div>
           ) : existing ? (
-            <StatusCard application={existing} onAdmin={() => navigate("/admin")} />
+            <StatusCard application={existing} onAdmin={() => navigate("/seller")} />
           ) : (
             <form
               onSubmit={submit}
@@ -229,7 +230,7 @@ const StatusCard = ({
   application,
   onAdmin,
 }: {
-  application: any;
+  application: Tables<"seller_applications">;
   onAdmin: () => void;
 }) => {
   if (application.status === "approved") {
@@ -251,11 +252,11 @@ const StatusCard = ({
       </div>
     );
   }
-  if (application.status === "rejected") {
+  if (application.status === "rejected" || application.status === "blocked") {
     return (
       <div className="rounded-3xl border border-destructive/30 bg-destructive/5 p-10 text-center shadow-soft">
         <X className="mx-auto h-12 w-12 text-destructive" />
-        <h2 className="mt-4 font-display text-2xl font-semibold">Ariza rad etilgan</h2>
+        <h2 className="mt-4 font-display text-2xl font-semibold">{application.status === "blocked" ? "Sotuvchi hisobi bloklangan" : "Ariza rad etilgan"}</h2>
         {application.admin_note && (
           <p className="mt-4 rounded-xl bg-card p-4 text-sm text-left">
             <b>Sabab:</b> {application.admin_note}

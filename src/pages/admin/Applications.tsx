@@ -14,15 +14,16 @@ type App = {
   university: string;
   product_type: string;
   bio: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "blocked";
   admin_note: string | null;
   created_at: string;
 };
 
-const STATUS_TABS: { v: "pending" | "approved" | "rejected" | "all"; l: string }[] = [
+const STATUS_TABS: { v: "pending" | "approved" | "rejected" | "blocked" | "all"; l: string }[] = [
   { v: "pending", l: "Yangi" },
   { v: "approved", l: "Tasdiqlangan" },
   { v: "rejected", l: "Rad etilgan" },
+  { v: "blocked", l: "Bloklangan" },
   { v: "all", l: "Barchasi" },
 ];
 
@@ -38,7 +39,7 @@ const Applications = () => {
       .order("created_at", { ascending: false });
     if (tab !== "all") q = q.eq("status", tab);
     const { data } = await q;
-    setItems((data as any) ?? []);
+    setItems((data as App[]) ?? []);
   };
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const Applications = () => {
     load();
   }, [tab]);
 
-  const decide = async (a: App, status: "approved" | "rejected") => {
+  const decide = async (a: App, status: "approved" | "rejected" | "blocked") => {
     const { error } = await supabase
       .from("seller_applications")
       .update({ status, admin_note: notes[a.id] ?? a.admin_note })
@@ -56,7 +57,7 @@ const Applications = () => {
       return;
     }
     toast({
-      title: status === "approved" ? "Ariza tasdiqlandi" : "Ariza rad etildi",
+      title: status === "approved" ? "Ariza tasdiqlandi" : status === "blocked" ? "Sotuvchi bloklandi" : "Ariza rad etildi",
       description:
         status === "approved" ? `${a.full_name} endi sotuvchi.` : undefined,
     });
@@ -118,7 +119,7 @@ const Applications = () => {
                 <p className="rounded-xl bg-secondary/50 p-3 text-foreground">{a.bio}</p>
               </div>
 
-              {a.status === "pending" ? (
+              {a.status === "pending" || a.status === "blocked" || a.status === "rejected" ? (
                 <>
                   <Textarea
                     placeholder="Admin izohi (ixtiyoriy)..."
@@ -151,6 +152,7 @@ const Applications = () => {
                   </p>
                 )
               )}
+              {a.status === "approved" && <Button className="mt-4" variant="destructive" onClick={() => { if (confirm("Sotuvchi bloklansinmi? Mahsulotlari ham yashiriladi.")) decide(a, "blocked"); }}>Sotuvchini bloklash</Button>}
             </div>
           ))}
         </div>
@@ -160,10 +162,11 @@ const Applications = () => {
 };
 
 const StatusBadge = ({ status }: { status: string }) => {
-  const map: Record<string, { l: string; c: string; i: any }> = {
+  const map: Record<string, { l: string; c: string; i: typeof Clock }> = {
     pending: { l: "Kutilmoqda", c: "bg-accent text-accent-foreground", i: Clock },
     approved: { l: "Tasdiqlangan", c: "bg-success/15 text-success", i: Check },
     rejected: { l: "Rad etilgan", c: "bg-destructive/15 text-destructive", i: X },
+    blocked: { l: "Bloklangan", c: "bg-destructive/15 text-destructive", i: X },
   };
   const m = map[status];
   if (!m) return null;

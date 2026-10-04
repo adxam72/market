@@ -6,9 +6,12 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/types/db";
 import { toast } from "sonner";
+import { useRole } from "@/hooks/useRole";
+import { errorMessage } from "@/lib/marketplace";
 
 const Account = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
+  const { isSeller, isAdmin } = useRole();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -20,6 +23,7 @@ const Account = () => {
     });
   }, [user]);
 
+  if (authLoading) return <Layout><p className="container py-20">Yuklanmoqda...</p></Layout>;
   if (!user) return <Navigate to="/auth" replace />;
   if (!profile) return <Layout><div className="container py-20 text-center text-muted-foreground">Yuklanmoqda...</div></Layout>;
 
@@ -42,6 +46,7 @@ const Account = () => {
           <h1 className="font-display text-3xl font-semibold md:text-4xl">Profilim</h1>
           <Button variant="outline" asChild><Link to="/account/orders">Buyurtmalarim</Link></Button>
         </div>
+        <nav className="mt-6 flex flex-wrap gap-3 text-sm"><Link className="rounded-xl border px-4 py-2" to="/account/addresses">Manzillarim</Link><Link className="rounded-xl border px-4 py-2" to="/account/favorites">Sevimlilar</Link><Link className="rounded-xl border px-4 py-2" to="/account/security">Xavfsizlik</Link>{isSeller && <Link className="rounded-xl bg-primary px-4 py-2 text-white" to="/seller">Sotuvchi paneli</Link>}{isAdmin && <Link className="rounded-xl border px-4 py-2" to="/admin">Admin panel</Link>}</nav>
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="grid gap-4 sm:grid-cols-2">

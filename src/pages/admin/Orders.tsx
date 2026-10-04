@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Phone, MapPin } from "lucide-react";
+import { errorMessage } from "@/lib/marketplace";
+import type { Database } from "@/integrations/supabase/types";
 
 type Order = {
   id: string;
@@ -53,9 +55,9 @@ const AdminOrders = () => {
       .from("orders")
       .select("*, order_items(*)")
       .order("created_at", { ascending: false });
-    if (filter !== "all") q = q.eq("status", filter as any);
+    if (filter !== "all") q = q.eq("status", filter as Database["public"]["Enums"]["order_status"]);
     const { data } = await q;
-    setOrders((data as any) ?? []);
+    setOrders((data as Order[]) ?? []);
   };
 
   useEffect(() => {
@@ -64,9 +66,9 @@ const AdminOrders = () => {
   }, [filter]);
 
   const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("orders").update({ status: status as any }).eq("id", id);
+    const { error } = await supabase.rpc("set_order_status", { p_order_id: id, p_status: status as Database["public"]["Enums"]["order_status"] });
     if (error) {
-      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      toast({ title: "Xatolik", description: errorMessage(error), variant: "destructive" });
       return;
     }
     toast({ title: "Status yangilandi" });

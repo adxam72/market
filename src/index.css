@@ -9,7 +9,7 @@
 @layer base {
   :root {
     /* Clean light background */
-    --background: 230 25% 97%;
+    --background: 40 20% 98%;
     --foreground: 230 25% 10%;
 
     --card: 230 25% 100%;
@@ -19,20 +19,20 @@
     --popover-foreground: 230 25% 10%;
 
     /* Purple-blue primary */
-    --primary: 255 65% 55%;
+    --primary: 164 43% 24%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 230 80% 58%;
 
     /* Soft lavender secondary */
-    --secondary: 240 20% 92%;
+    --secondary: 150 13% 94%;
     --secondary-foreground: 230 25% 15%;
 
     --muted: 240 15% 93%;
     --muted-foreground: 230 12% 45%;
 
     /* Light purple accent */
-    --accent: 255 30% 88%;
-    --accent-foreground: 255 40% 30%;
+    --accent: 150 23% 91%;
+    --accent-foreground: 164 43% 24%;
 
     --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
@@ -42,13 +42,13 @@
 
     --border: 240 15% 87%;
     --input: 240 15% 89%;
-    --ring: 255 65% 55%;
+    --ring: 164 43% 24%;
 
     --radius: 0.875rem;
 
     /* Brand gradients & shadows */
     --gradient-warm: linear-gradient(135deg, hsl(245 30% 95%) 0%, hsl(230 35% 90%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(265 70% 58%) 0%, hsl(225 85% 55%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(164 43% 24%) 0%, hsl(164 40% 33%) 100%);
     --gradient-hero: linear-gradient(180deg, hsl(240 25% 97% / 0) 0%, hsl(230 25% 97%) 100%);
 
     --shadow-soft: 0 2px 12px -2px hsl(230 30% 20% / 0.06);
@@ -98,7 +98,7 @@
     font-feature-settings: "ss01", "cv11";
   }
   h1, h2, h3, h4, .font-display {
-    font-family: 'Fraunces', Georgia, serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-optical-sizing: auto;
     letter-spacing: -0.01em;
   }
@@ -115,3 +115,6 @@
     background-size: 16px 16px;
   }
 }
+
+.hero-market { background: #eaf0e7; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }

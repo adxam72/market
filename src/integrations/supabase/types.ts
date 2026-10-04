@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      coupons: {
+        Row: { id: string; code: string; percent: number; min_total: number; max_discount: number; expires_at: string; usage_limit: number; used: number; is_active: boolean }
+        Insert: { code: string; percent: number; min_total?: number; max_discount: number; expires_at: string; usage_limit: number; is_active?: boolean }
+        Update: { is_active?: boolean }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: { id: string; user_id: string; subject: string; message: string; product_id: string | null; product_name: string | null; status: string; admin_reply: string | null; replied_at: string | null; created_at: string; updated_at: string }
+        Insert: { user_id: string; subject: string; message: string; product_id?: string | null; product_name?: string | null }
+        Update: { admin_reply?: string; status?: string; replied_at?: string }
+        Relationships: [{ foreignKeyName: "support_tickets_profile_fkey"; columns: ["user_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }]
+      }
+      addresses: {
+        Row: { id: string; user_id: string; label: string; full_name: string; phone: string; region: string; district: string; street: string; landmark: string; created_at: string }
+        Insert: { id?: string; user_id: string; label: string; full_name: string; phone: string; region: string; district: string; street: string; landmark?: string; created_at?: string }
+        Update: { label?: string; full_name?: string; phone?: string; region?: string; district?: string; street?: string; landmark?: string }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -214,6 +232,7 @@ export type Database = {
           rating_avg: number
           rating_count: number
           seller_id: string | null
+          seller_name: string | null
           sku: string
           slug: string
           stock: number
@@ -233,6 +252,7 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           seller_id?: string | null
+          seller_name?: string | null
           sku: string
           slug: string
           stock?: number
@@ -252,6 +272,7 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           seller_id?: string | null
+          seller_name?: string | null
           sku?: string
           slug?: string
           stock?: number
@@ -416,6 +437,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      place_order: {
+        Args: { p_items: Json; p_name: string; p_phone: string; p_address: string; p_checkout_key: string; p_coupon?: string }
+        Returns: string
+      }
+      seller_orders: { Args: Record<string, never>; Returns: Json }
+      update_fulfillment: { Args: { p_item_id: string; p_status: string }; Returns: undefined }
+      set_order_status: { Args: { p_order_id: string; p_status: Database["public"]["Enums"]["order_status"] }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
