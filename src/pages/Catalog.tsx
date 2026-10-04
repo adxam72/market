@@ -33,7 +33,7 @@ export default function Catalog() {
     }
     setProducts(all); setLoading(false);
   };
-  useEffect(() => { document.title = "Mahsulotlar — DTPI Market"; void load(); }, []);
+  useEffect(() => { void load(); }, []);
   useEffect(() => { setQ(params.get("q") ?? ""); setPage(1); }, [params]);
   const results = useMemo(() => filterProducts(products, categories, params), [products, categories, params]);
   const setFilter = (key: string, value: string) => { const next = new URLSearchParams(params); if (value) next.set(key, value); else next.delete(key); setParams(next); };

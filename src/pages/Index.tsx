@@ -32,7 +32,7 @@ export default function Index() {
     else { setCategories(cats.data ?? []); setFeatured(products.data ?? []); }
     setLoading(false);
   };
-  useEffect(() => { document.title = "DTPI Market — Yaqin insonlar, katta g‘oyalar"; void load(); }, []);
+  useEffect(() => { void load(); }, []);
   return <Layout><div className={`campus-page ${paused ? "motion-paused" : ""}`}>
     <section className="campus-hero relative isolate overflow-hidden">
       <div className="campus-ambient pointer-events-none absolute inset-0 -z-10" aria-hidden="true"><div className="ambient-orb ambient-orb-one" /><div className="ambient-orb ambient-orb-two" /><div className="campus-grid absolute inset-0" /></div>

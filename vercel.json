@@ -3,10 +3,19 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/((?!assets/|products/|favicon.ico|robots.txt|placeholder.svg).*)", "destination": "/index.html" }],
+  "cleanUrls": true,
+  "rewrites": [{ "source": "/((?!assets/|products/|seo/|favicon.ico|robots.txt|sitemap.xml|placeholder.svg|google[^/]*\\.html).*)", "destination": "/" }],
   "headers": [{ "source": "/(.*)", "headers": [
     { "key": "X-Content-Type-Options", "value": "nosniff" },
     { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
     { "key": "X-Frame-Options", "value": "DENY" }
-  ] }]
+  ] },
+  { "source": "/admin/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] },
+  { "source": "/account/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] },
+  { "source": "/seller/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] },
+  { "source": "/auth", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] },
+  { "source": "/cart", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] },
+  { "source": "/checkout", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] },
+  { "source": "/support", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }] }
+  ]
 }

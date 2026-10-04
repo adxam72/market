@@ -13,6 +13,7 @@ import ProductCard from "@/components/ProductCard";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { errorMessage } from "@/lib/marketplace";
+import { applySeo } from "@/lib/seo";
 
 type Review = { id: string; rating: number; comment: string | null; created_at: string; user_id: string };
 
@@ -38,6 +39,13 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!slug) return;
+    const path = `/product/${encodeURIComponent(slug)}`;
+    if (product && product.slug === slug) applySeo(path, { title: `${product.name} — DTPI Market, Denov`, description: (product.description || `${product.name}. DTPI Marketdagi mahalliy mahsulot. Xizmat hududi: DTPI va Denovdagi yaqin atrof.`).replace(/\s+/g, ' ').slice(0, 170), image: product.images.find(image => /^https?:\/\//.test(image)) });
+    else if (!loading && !error) applySeo(path, { title: 'Mahsulot topilmadi — DTPI Market', description: 'Bu mahsulot mavjud emas.', noindex: true });
+  }, [product, slug, loading, error]);
+
+  useEffect(() => {
+    if (!slug) return;
     setProduct(null); setLoading(true); setError(""); setQty(1); setActiveImage(0);
     setReviews([]); setRelated([]); setCanReview(false); setAlreadyReviewed(false);
     let cancelled = false;
@@ -48,7 +56,6 @@ const ProductDetail = () => {
       if (loadError) { setError(errorMessage(loadError)); return; }
       if (data) {
         setProduct(data as Product);
-        document.title = `${data.name} — DTPI Market`;
         const { data: rel } = await supabase
           .from("products").select("*").eq("is_active", true).eq("category_id", data.category_id).neq("id", data.id).limit(4);
         if (rel && !cancelled) setRelated(rel as Product[]);

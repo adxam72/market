@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import Index from "./pages/Index.tsx";
+import RouteSeo from "./components/RouteSeo";
 const Favorites = lazy(() => import("./pages/Favorites.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Catalog = lazy(() => import("./pages/Catalog.tsx"));
@@ -50,6 +51,7 @@ const App = () => isBackendConfigured ? (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <RouteSeo />
         <AuthProvider>
           <CartProvider>
             <FavoritesProvider>

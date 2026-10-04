@@ -8,13 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Synthetic settings. E2E intercepts all backend requests; no live credentials.
+      SEO_SKIP_PRODUCT_FETCH: "1"
       VITE_SUPABASE_URL: https://dtpi-test.supabase.co
       VITE_SUPABASE_PUBLISHABLE_KEY: test-publishable-key
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run typecheck

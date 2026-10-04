@@ -171,3 +171,20 @@ test('guest is redirected from admin and seller entry remains protected', async 
   await page.goto('/seller', { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveURL(/auth/);
 });
+
+test('SEO follows product navigation and keeps private pages out of search', async ({ page }) => {
+  await mockApi(page);
+  await page.goto('/catalog?q=sinov', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://dtpi.store/catalog');
+  await expect(page).toHaveTitle('Mahsulotlar katalogi — DTPI Market, Denov');
+  await page.goto(`/product/${products[0].slug}`, { waitUntil: 'domcontentloaded' });
+  await expect(page).toHaveTitle(`${products[0].name} — DTPI Market, Denov`);
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://dtpi.store/product/${products[0].slug}`);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', `${products[0].name} — DTPI Market, Denov`);
+  await page.goto('/cart', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, follow');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#site-structured-data')).toHaveCount(1);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow, max-image-preview:large');
+});

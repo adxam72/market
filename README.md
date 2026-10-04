@@ -109,3 +109,11 @@ npm run build
 Playwright testlari o‘rnatilgan Chrome’dan foydalanadi. Chrome mavjud bo‘lmasa, Playwright brauzerini o‘rnating va `playwright.config.ts` dagi channelni moslang. `artifacts/` test suratlari va natijalari uchun; Gitga yuborilmaydi.
 
 Rasmiy texnik manbalar: [Supabase database functions](https://supabase.com/docs/guides/database/functions), [Vercel rewrites](https://vercel.com/docs/routing/rewrites), [GitHub Actions setup-node](https://github.com/actions/setup-node).
+
+## Qidiruv tizimlari (SEO)
+
+Production build ochiq sahifalar va faol mahsulotlar uchun alohida HTML sarlavha, tavsif, canonical va ijtimoiy tarmoq metama’lumotlarini yaratadi. Sahifa tanasi React orqali yuklanadi; bu to‘liq server rendering emas. Bosh sahifada WebSite JSON-LD mavjud. `/sitemap.xml` va `/robots.txt` Google uchun ochiq; shaxsiy sahifalar meta robots va Vercel X-Robots-Tag orqali noindex qilinadi. Bu indekslash sozlamasi, kirish xavfsizligini almashtirmaydi.
+
+Mahsulotlar build vaqtida faqat ochiq Supabase API orqali o‘qiladi. Yangi mahsulotlar sitemapga keyingi deploymentda qo‘shiladi. CI mock backend bilan ishlagani uchun faqat CI’da `SEO_SKIP_PRODUCT_FETCH=1` ishlatiladi. Production’da buni qo‘ymang. SEO build uchun Node 22.18+ yoki Node 24 kerak.
+
+Google Search Console’da URL prefix sifatida `https://dtpi.store/` ni qo‘shing. HTML tag usulidan olingan tokenni Vercel Production environment’da `GOOGLE_SITE_VERIFICATION` qilib belgilang va qayta deploy qiling. So‘ng Verify tugmasini bosing, Sitemaps bo‘limiga `sitemap.xml` yuboring va bosh sahifa uchun URL Inspection → Request indexing qiling. Indekslash va qidiruvdagi o‘rinni Google belgilaydi; birinchi o‘rin kafolatlanmaydi.
