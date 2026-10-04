@@ -165,7 +165,7 @@ const ProductDetail = () => {
 
             <p className="mt-6 leading-relaxed text-muted-foreground">{product.description}</p>
 
-            <div className="mt-8 flex items-center gap-4">
+            <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-1 rounded-full border border-input bg-background p-1">
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary">
                   <Minus className="h-4 w-4" />
@@ -178,7 +178,7 @@ const ProductDetail = () => {
               <Button
                 size="lg"
                 variant="hero"
-                className="flex-1"
+                className="min-w-[12rem] flex-1"
                 disabled={product.stock === 0}
                 onClick={() => addToCart(product, qty)}
               >
@@ -204,9 +204,9 @@ const ProductDetail = () => {
             <Button variant="outline" className="mt-5 w-full" disabled={product.stock === 0} onClick={async () => { await addToCart(product, qty); navigate("/cart"); }}>Hozir xarid qilish</Button>
 
             <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-6 text-center text-xs">
-              <div className="flex flex-col items-center gap-2"><Truck className="h-5 w-5 text-primary" /><span>Tezkor yetkazish</span></div>
-              <div className="flex flex-col items-center gap-2"><Package className="h-5 w-5 text-primary" /><span>Markaziy ombor</span></div>
-              <div className="flex flex-col items-center gap-2"><Shield className="h-5 w-5 text-primary" /><span>Sifat kafolati</span></div>
+              <div className="flex flex-col items-center gap-2"><Truck className="h-5 w-5 text-primary" /><span>Mahalliy topshirish</span></div>
+              <div className="flex flex-col items-center gap-2"><Package className="h-5 w-5 text-primary" /><span>Sotuvchi bilan aloqa</span></div>
+              <div className="flex flex-col items-center gap-2"><Shield className="h-5 w-5 text-primary" /><span>Hamjamiyat ishonchi</span></div>
             </div>
           </div>
         </div>

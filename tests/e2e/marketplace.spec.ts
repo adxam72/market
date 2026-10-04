@@ -179,6 +179,8 @@ test('SEO follows product navigation and keeps private pages out of search', asy
   await expect(page).toHaveTitle('Mahsulotlar katalogi — DTPI Market, Denov');
   await page.goto(`/product/${products[0].slug}`, { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveTitle(`${products[0].name} — DTPI Market, Denov`);
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://dtpi.store/product/${products[0].slug}`);
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', `${products[0].name} — DTPI Market, Denov`);
