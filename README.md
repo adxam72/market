@@ -23,6 +23,7 @@ Mavjud baza nusxasini saqlang. SQL Editor yoki Supabase CLI orqali **faqat yangi
 
 1. `supabase/migrations/202610030001_marketplace_upgrade.sql`
 2. `supabase/migrations/202610030002_addresses.sql`
+3. `supabase/migrations/202610040001_production_schema_repair.sql`
 
 Avval migratsiyalar, keyin yangi frontendni chiqarish kerak: checkout endi `place_order` RPC dan foydalanadi. Eski frontend bu migratsiyalardan keyin buyurtmani to‘g‘ridan-to‘g‘ri yozolmaydi. Shuning uchun yangilashni bitta xizmat oynasida bajaring. Migratsiyalar mavjud mahsulot va buyurtmalarni o‘chirmaydi; eski buyurtmalardagi ombor hisobi yangi buyurtmalardan alohida saqlanadi.
 
@@ -51,7 +52,7 @@ Frontend orqali o‘ziga admin yoki sotuvchi huquqini berish mumkin emas.
 
 `vercel.json` SPA sahifalarini qayta ochish (`/product/...`, `/seller/...`, `/admin/...`) va himoya sarlavhalarini sozlaydi. Saytning barcha yo‘llari HTTPS domen orqali tekshirilishi kerak. DNS qiymatlari Vercel domen sozlamasidan olinadi; domen noma’lum bo‘lganda taxminiy DNS yozilmaydi.
 
-2026-10-04 tekshiruvida mavjud Supabase bazasiga ulanish tasdiqlandi: 4 kategoriya va 23 mahsulot. Vercel loyihasi market-cyp9, domen https://dtpi.store tasdiqlangan. Supabase URL va brauzer uchun publishable kaliti Vercelning Production, Preview va Development muhitlariga kiritildi. Jonli bazaga migratsiya yoki yangi frontendni Productionga chiqarish hali bajarilmadi; buning uchun Supabase boshqaruv ulanishi kerak.
+2026-10-04: Vercel market-cyp9 loyihasida dtpi.store domeni tasdiqlangan va Supabase environment sozlamalari kiritilgan. Uchta upgrade migratsiyasi jonli bazaga muvaffaqiyatli qo‘llandi. 23 mahsulot va 11 buyurtmaning nazorat xeshlari yangilanishdan keyin ham mos. Sotuvchi tasdiqlash triggeri va eski support siyosatlari tiklandi.
 
 ## Ishlaydigan qismlar
 
